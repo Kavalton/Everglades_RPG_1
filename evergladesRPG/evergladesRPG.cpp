@@ -50,6 +50,7 @@ Pseudocode:
 #include <iomanip>
 #include <random>
 #include <ctime>
+#include <cmath>
 
 using namespace std;
 
@@ -70,6 +71,7 @@ void intro();
 void instructions();
 void play();
 void playerView(string[6][6], LOCATION);
+bool isItValid(int mve1, int mve2, LOCATION);
 string threat(string);
 //void setUp();
 
@@ -82,10 +84,10 @@ int main() {
 
 		switch (stoi(choice)) {
 		case 1:
-			play();
+			instructions();
 			break;
 		case 2:
-			instructions();
+			play();
 			break;
 		default:
 			cout << "\n\nGood Bye ... \n\n";
@@ -135,6 +137,22 @@ string threat(string type) {
 	return outcome;
 }
 /**********
+* bool isItValid(int mve1, int mve2, LOCATION rangr)
+* This function checks to see if the move is valid
+//**********/
+bool isItValid(int mve1, int mve2, LOCATION rangr) {
+	if ((abs(mve1 - rangr.row)) > 1) {
+		cout << "\nThat's too far!\nYou must move to a square adjacent to you.\n";
+		return false;
+	}
+	else if ((abs(mve2 - rangr.col)) > 1) {
+		cout << "That's too far!\nYou must move to a square adjacent to you.\n";
+		return false;
+	}
+	else
+		return true;
+}
+/**********
  void move(string[][])
  This function moves the ranger through the board
 //**********/
@@ -143,6 +161,7 @@ void move(string mboard[6][6], LOCATION rang) {
 	const int ROWS = 6, COLS = 6;
 	int move1, move2, newRow = rang.row, newCol = rang.col;
 	string newBoard[ROWS][COLS], result = "";
+	bool valid = false;
 	//Copy mboard to newBoard
 	for (int r = 0; r < ROWS; r++) {
 		for (int c = 0; c < COLS; c++) {
@@ -151,12 +170,21 @@ void move(string mboard[6][6], LOCATION rang) {
 	}
 //	cout << "Ranger location is: " << rang.row << " " << rang.col << endl;//test
 	//Move ranger
-		cout << "Enter a move: \nROW: ";
-		cin >> move1;
-		move1 += 1; //calibrates movement to game board
-		cout << "COLUMN: ";
-		cin >> move2;
+	do {
+		do {
+			cout << "Enter a move: \nROW: ";
+			cin >> move1;
+		} while (move1 > 4);
+		do {
+			move1 += 1; //calibrates movement to game board
+			cout << "COLUMN: ";
+			cin >> move2;
+		} while (move2 > 4);
 		move2 += 1; //calibrates movement to game board
+		//Check validity of players move
+		valid = isItValid(move1, move2, rang);
+	}while (valid == false);
+		
 		if (mboard[move1][move2] == "| T "){
 			cout << "You win.";
 			rang.gong = 0;
@@ -418,8 +446,8 @@ string menu() {
 	string choice;
 	//Display menu
 	cout << "\nChoose one of the following options\n" <<
-		"\t1. Play Lost in the Everglades\n" <<
-		"\t2. Display Instructions\n" <<
+		"\t1. Display Instructions\n" <<
+		"\t2. Play Lost in the Everglades\n" <<
 		"\t3. Quit.\n" <<
 		">>> ";
 	//Validate choice
